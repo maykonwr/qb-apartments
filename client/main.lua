@@ -363,21 +363,6 @@ local function SetInApartmentTargets()
                 }
             }
         })
-
-        InApartmentTargets['logoutPos'] = exports['ox_target']:addBoxZone({
-            coords = logoutPos,
-            size = vec3(1.5, 1.5, 1.5),
-            rotation = 0,
-            debug = false,
-            options = {
-                {
-                    type = 'client',
-                    event = 'apartments:client:Logout',
-                    icon = 'fas fa-sign-out-alt',
-                    label = Lang:t('text.logout'),
-                }
-            }
-        })
     else
         -- For non-target version
         InApartmentTargets['stashPos'] = lib.zones.box({
@@ -394,14 +379,6 @@ local function SetInApartmentTargets()
             rotation = 0,
             debug = false,
             text = '[E] ' .. Lang:t('text.change_outfit')
-        })
-
-        InApartmentTargets['logoutPos'] = lib.zones.box({
-            coords = logoutPos,
-            size = vec3(2, 2, 2),
-            rotation = 0,
-            debug = false,
-            text = '[E] ' .. Lang:t('text.logout')
         })
 
         InApartmentTargets['entrancePos'] = lib.zones.box({
@@ -661,7 +638,6 @@ RegisterNetEvent('apartments:client:setupSpawnUI', function(cData)
         if result then
             TriggerEvent('qb-spawn:client:setupSpawns', cData, false, nil)
             TriggerEvent('qb-spawn:client:openUI', true)
-            TriggerEvent('apartments:client:SetHomeBlip', result.type)
         else
             if Apartments.Starting then
                 TriggerEvent('qb-spawn:client:setupSpawns', cData, true, Apartments.Locations)
@@ -669,7 +645,6 @@ RegisterNetEvent('apartments:client:setupSpawnUI', function(cData)
             else
                 TriggerEvent('qb-spawn:client:setupSpawns', cData, false, nil)
                 TriggerEvent('qb-spawn:client:openUI', true)
-                TriggerEvent('apartments:client:SetHomeBlip', nil)
             end
         end
     end, cData.citizenid)
@@ -692,31 +667,6 @@ end)
 RegisterNetEvent('qb-apartments:client:LastLocationHouse', function(apartmentType, apartmentId)
     ClosestHouse = apartmentType
     EnterApartment(apartmentType, apartmentId, false)
-end)
-
-RegisterNetEvent('apartments:client:SetHomeBlip', function(home)
-    CreateThread(function()
-        SetClosestApartment()
-        for name, _ in pairs(Apartments.Locations) do
-            RemoveBlip(Apartments.Locations[name].blip)
-
-            Apartments.Locations[name].blip = AddBlipForCoord(Apartments.Locations[name].coords.enter.x, Apartments.Locations[name].coords.enter.y, Apartments.Locations[name].coords.enter.z)
-            if (name == home) then
-                SetBlipSprite(Apartments.Locations[name].blip, 475)
-                SetBlipCategory(Apartments.Locations[name].blip, 11)
-            else
-                SetBlipSprite(Apartments.Locations[name].blip, 476)
-                SetBlipCategory(Apartments.Locations[name].blip, 10)
-            end
-            SetBlipDisplay(Apartments.Locations[name].blip, 4)
-            SetBlipScale(Apartments.Locations[name].blip, 0.65)
-            SetBlipAsShortRange(Apartments.Locations[name].blip, true)
-            SetBlipColour(Apartments.Locations[name].blip, 3)
-            AddTextEntry(Apartments.Locations[name].label, Apartments.Locations[name].label)
-            BeginTextCommandSetBlipName(Apartments.Locations[name].label)
-            EndTextCommandSetBlipName(Apartments.Locations[name].blip)
-        end
-    end)
 end)
 
 RegisterNetEvent('apartments:client:RingMenu', function(data)
@@ -793,9 +743,6 @@ RegisterNetEvent('apartments:client:ChangeOutfit', function()
     TriggerEvent('qb-clothing:client:openOutfitMenu')
 end)
 
-RegisterNetEvent('apartments:client:Logout', function()
-    TriggerServerEvent('vms_multichars:relog')
-end)
 
 
 -- Threads
@@ -870,7 +817,6 @@ else
 
                 if IsInsideLogoutZone then
                     if IsControlJustPressed(0, 38) then
-                        TriggerEvent('apartments:client:Logout')
                         exports['qb-core']:HideText()
                     end
                 end

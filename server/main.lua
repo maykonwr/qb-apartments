@@ -86,7 +86,6 @@ RegisterNetEvent('apartments:server:CreateApartment', function(type, label, firs
     if firstSpawn then
         TriggerClientEvent('apartments:client:SpawnInApartment', src, apartmentId, type)
     end
-    TriggerClientEvent('apartments:client:SetHomeBlip', src, type)
 end)
 
 RegisterNetEvent('apartments:server:UpdateApartment', function(type, label)
@@ -94,7 +93,6 @@ RegisterNetEvent('apartments:server:UpdateApartment', function(type, label)
     local Player = QBCore.Functions.GetPlayer(src)
     MySQL.update('UPDATE apartments SET type = ?, label = ? WHERE citizenid = ?', { type, label, Player.PlayerData.citizenid })
     TriggerClientEvent('QBCore:Notify', src, Lang:t('success.changed_apart'))
-    TriggerClientEvent("apartments:client:SetHomeBlip", src, type)
     if ox_inventory then
         local result = MySQL.query.await('SELECT * FROM apartments WHERE citizenid = ?', { Player.PlayerData.citizenid })
         if result[1] ~= nil then
